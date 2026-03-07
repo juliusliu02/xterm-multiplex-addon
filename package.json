@@ -1,0 +1,27 @@
+{
+  "name": "xterm-multiplex-addon",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsdown",
+    "lint": "eslint ."
+  },
+  "exports": {
+    ".": "./lib/MultiplexAddon.js"
+  },
+  "types": "./lib/MultiplexAddon.d.ts",
+  "keywords": [],
+  "author": "Julius Liu",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.3",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@xterm/xterm": "^6.0.0",
+    "eslint": "^10.0.3",
+    "globals": "^17.4.0",
+    "jiti": "^2.6.1",
+    "tsdown": "^0.21.0",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^4.0.18"
+  }
+}
