@@ -1,5 +1,9 @@
 import type { Handler, Disposable, MessageType } from "./types";
 
+type PublishOptions = {
+  debounce?: number;
+};
+
 export class Multiplexer {
   private handlers = new Map<MessageType, Set<Handler>>();
   private ws: WebSocket;
@@ -68,9 +72,36 @@ export class Multiplexer {
   publish(
     type: MessageType,
     attach: (emit: (payload: Uint8Array) => void) => Disposable,
+    options?: PublishOptions,
   ): Disposable {
-    const disposable = attach((payload) => this.send(type, payload));
-    return disposable;
+    const debounce = options?.debounce;
+    let timeout: number | undefined;
+
+    const disposable = attach((payload) => {
+      if (debounce === undefined) {
+        this.send(type, payload);
+        return;
+      }
+
+      if (timeout !== undefined) {
+        clearTimeout(timeout);
+      }
+
+      timeout = setTimeout(() => {
+        this.send(type, payload);
+        timeout = undefined;
+      }, debounce);
+    });
+
+    return {
+      dispose: () => {
+        if (timeout !== undefined) {
+          clearTimeout(timeout);
+          timeout = undefined;
+        }
+        disposable.dispose();
+      },
+    };
   }
 
   dispose() {

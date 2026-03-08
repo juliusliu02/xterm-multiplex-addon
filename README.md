@@ -121,11 +121,13 @@ Sends one framed message with the type prefix.
 ```ts
 publish(
   type: number,
-  attach: (emit: (payload: Uint8Array) => void) => Disposable
+  attach: (emit: (payload: Uint8Array) => void) => Disposable,
+  options?: { debounce?: number }
 ): Disposable
 ```
 
 Utility to bridge an event source to `send(type, payload)`.
+Set `options.debounce` for trailing debounce behavior.
 
 ### `dispose()`
 

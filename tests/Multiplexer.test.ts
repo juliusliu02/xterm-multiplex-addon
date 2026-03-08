@@ -76,6 +76,57 @@ describe("Multiplexer", () => {
     expect(dispose).toHaveBeenCalledTimes(1);
   });
 
+  it("publish supports trailing debounce", () => {
+    vi.useFakeTimers();
+
+    const ws = new MockWebSocket();
+    const multiplexer = new Multiplexer(ws as unknown as WebSocket);
+
+    let emitRef: ((payload: Uint8Array) => void) | undefined;
+    multiplexer.publish(
+      8,
+      (emit) => {
+        emitRef = emit;
+        return { dispose: () => {} };
+      },
+      { debounce: 50 },
+    );
+
+    emitRef?.(new Uint8Array([1]));
+    emitRef?.(new Uint8Array([2]));
+    vi.advanceTimersByTime(49);
+    expect(ws.sentFrames).toHaveLength(0);
+
+    vi.advanceTimersByTime(1);
+    expect(ws.sentFrames).toHaveLength(1);
+    expect(Array.from(ws.sentFrames[0]!)).toEqual([8, 2]);
+    vi.useRealTimers();
+  });
+
+  it("publish debounce clears pending timer on dispose", () => {
+    vi.useFakeTimers();
+
+    const ws = new MockWebSocket();
+    const multiplexer = new Multiplexer(ws as unknown as WebSocket);
+
+    let emitRef: ((payload: Uint8Array) => void) | undefined;
+    const sub = multiplexer.publish(
+      9,
+      (emit) => {
+        emitRef = emit;
+        return { dispose: () => {} };
+      },
+      { debounce: 50 },
+    );
+
+    emitRef?.(new Uint8Array([7]));
+    sub.dispose();
+    vi.advanceTimersByTime(50);
+
+    expect(ws.sentFrames).toHaveLength(0);
+    vi.useRealTimers();
+  });
+
   it("dispose unsubscribes message handling", () => {
     const ws = new MockWebSocket();
     const multiplexer = new Multiplexer(ws as unknown as WebSocket);
