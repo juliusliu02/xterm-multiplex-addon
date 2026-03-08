@@ -1,10 +1,7 @@
-type Disposable = { dispose(): void };
-type Handler = (payload: Uint8Array) => void;
-type MessageType = number;
+import type { Handler, Disposable, MessageType } from "./types";
 
-export class Multiplex {
-  private disposables: Disposable[] = [];
-  private handlers = new Map<MessageType, Handler>();
+export class Multiplexer {
+  private handlers = new Map<MessageType, Set<Handler>>();
   private ws: WebSocket;
   private readonly onMessage: (e: MessageEvent) => void;
 
@@ -18,17 +15,33 @@ export class Multiplex {
       const msg = new Uint8Array(e.data);
       if (msg.length === 0) return;
 
-      const type = msg[0];
+      const type = msg[0]!;
       const payload = msg.slice(1);
 
-      this.handlers.get(type as number)?.(payload);
+      const handlers = this.handlers.get(type);
+      if (!handlers) return;
+
+      for (const cb of [...handlers]) {
+        cb(payload);
+      }
     };
 
     this.ws.addEventListener("message", this.onMessage);
   }
 
-  handle(type: MessageType, handler: Handler) {
-    this.handlers.set(type, handler);
+  handle(type: MessageType, handler: Handler): Disposable {
+    let set = this.handlers.get(type);
+
+    if (!set) {
+      set = new Set();
+      this.handlers.set(type, set);
+    }
+
+    set.add(handler);
+
+    return {
+      dispose: () => set!.delete(handler),
+    };
   }
 
   unhandle(type: MessageType): void {
@@ -36,11 +49,11 @@ export class Multiplex {
   }
 
   /**
-   * Send an one-off message with prefixed byte.
+   * Send a one-off message with prefixed byte.
    * @param type prefixed byte
    * @param payload encoded message
    */
-  send(type: number, payload: Uint8Array) {
+  send(type: MessageType, payload: Uint8Array) {
     const frame = new Uint8Array(payload.length + 1);
     frame[0] = type;
     frame.set(payload, 1);
@@ -53,17 +66,17 @@ export class Multiplex {
    * @param attach function to subscribe to
    */
   publish(
-    type: number,
+    type: MessageType,
     attach: (emit: (payload: Uint8Array) => void) => Disposable,
-  ): void {
+  ): Disposable {
     const disposable = attach((payload) => this.send(type, payload));
-    this.disposables.push(disposable);
+    return disposable;
   }
 
   dispose() {
     this.ws.removeEventListener("message", this.onMessage);
-    for (const d of this.disposables) d.dispose();
-    this.disposables.length = 0;
     this.handlers.clear();
   }
 }
+
+export default Multiplexer;

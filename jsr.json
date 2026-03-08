@@ -1,0 +1,8 @@
+{
+  "name": "@juliusliu/xterm-multiplex-addon",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Multiplexed WebSocket transport and xterm addon for terminal streaming.",
+  "exports": "./src/index.ts",
+  "exclude": ["lib/**", "tests/**", "node_modules/**"]
+}

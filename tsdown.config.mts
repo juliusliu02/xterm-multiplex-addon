@@ -1,7 +1,7 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/MultiplexAddon.ts"],
+  entry: ["src/index.ts"],
   format: ["esm"],
   outDir: "lib",
   dts: true,

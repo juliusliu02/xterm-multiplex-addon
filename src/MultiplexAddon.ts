@@ -1,20 +1,37 @@
-import type { ITerminalAddon, Terminal } from "@xterm/xterm";
-import { Multiplex } from "./Multiplex";
+import type { IDisposable, ITerminalAddon, Terminal } from "@xterm/xterm";
+import { Multiplexer } from "./Multiplexer";
 
-export class MultiplexTerminalAddon implements ITerminalAddon {
-  constructor(private multiplex: Multiplex) {}
+export class MultiplexAddon implements ITerminalAddon {
+  private disposables: IDisposable[] = [];
+
+  constructor(
+    private multiplexer: Multiplexer,
+    private readonly streamDataType: number = 0,
+  ) {}
 
   activate(term: Terminal) {
-    this.multiplex.publish(0, (emit) =>
-      term.onData((data) => {
-        emit(new TextEncoder().encode(data));
-      })
-    );
+    const encoder = new TextEncoder();
 
-    this.multiplex.handle(0, (payload) => {
-      term.write(payload);
-    });
+    const subOutgoing = this.multiplexer.publish(this.streamDataType, (emit) =>
+      term.onData((data) => {
+        emit(encoder.encode(data));
+      }),
+    );
+    this.disposables.push(subOutgoing);
+
+    const subIncoming = this.multiplexer.handle(
+      this.streamDataType,
+      (payload) => {
+        term.write(payload);
+      },
+    );
+    this.disposables.push(subIncoming);
   }
 
-  dispose() {}
+  dispose() {
+    this.disposables.forEach((d) => d.dispose());
+    this.disposables.length = 0;
+  }
 }
+
+export default MultiplexAddon;
