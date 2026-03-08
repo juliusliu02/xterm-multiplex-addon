@@ -1,6 +1,6 @@
 {
   "name": "xterm-multiplex-addon",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Multiplex terminal stream and control messages over a single WebSocket for xterm.js.",
   "scripts": {
     "build": "tsdown",
