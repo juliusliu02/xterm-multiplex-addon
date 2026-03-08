@@ -11,11 +11,22 @@ It provides:
 ## Install
 
 ```bash
-pnpm add xterm-multiplex-addon
-# or npm i xterm-multiplex-addon
+pnpm add jsr:@juliusliu/xterm-multiplex-addon
 ```
 
-Peer expectation:
+## JSR
+
+Published as `@juliusliu/xterm-multiplex-addon` with source exports from `./src/index.ts`.
+
+```ts
+import {
+  Multiplexer,
+  MultiplexAddon,
+  createResizePublisher,
+} from "@juliusliu/xterm-multiplex-addon";
+```
+
+Runtime expectations:
 
 - Browser/runtime provides `WebSocket`
 - For `MultiplexAddon`, you use `@xterm/xterm`
@@ -83,7 +94,7 @@ Internally sets `ws.binaryType = "arraybuffer"` and listens for `message` events
 ### `handle(type, handler)`
 
 ```ts
-handle(type: number, handler: (payload: Uint8Array) => void): { dispose(): void }
+handle(type: number, handler: (payload: Uint8Array) => void): Disposable
 ```
 
 Registers a handler for incoming payloads of `type`.
@@ -110,8 +121,8 @@ Sends one framed message with the type prefix.
 ```ts
 publish(
   type: number,
-  attach: (emit: (payload: Uint8Array) => void) => { dispose(): void }
-): { dispose(): void }
+  attach: (emit: (payload: Uint8Array) => void) => Disposable
+): Disposable
 ```
 
 Utility to bridge an event source to `send(type, payload)`.
@@ -162,7 +173,11 @@ For resize channel payloads:
 
 ```ts
 function decodeResize(payload: Uint8Array) {
-  const view = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
+  const view = new DataView(
+    payload.buffer,
+    payload.byteOffset,
+    payload.byteLength,
+  );
   return {
     cols: view.getUint16(0),
     rows: view.getUint16(2),
@@ -187,6 +202,13 @@ pnpm install
 pnpm run build
 pnpm run lint
 pnpm run test
+```
+
+## Publish
+
+```bash
+jsr publish --dry-run
+jsr publish
 ```
 
 ## License
