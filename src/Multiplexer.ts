@@ -1,9 +1,20 @@
 import type { Handler, Disposable, MessageType } from "./types";
 
-type PublishOptions = {
+/**
+ * Options for `Multiplexer.publish`.
+ */
+export type PublishOptions = {
+  /**
+   * Trailing-edge debounce window in milliseconds.
+   * When set, only the latest payload within the window is sent.
+   */
   debounce?: number;
 };
 
+/**
+ * Routes typed binary frames over a single websocket connection.
+ * Frame format: first byte is message type, remaining bytes are payload.
+ */
 export class Multiplexer {
   private handlers = new Map<MessageType, Set<Handler>>();
   private ws: WebSocket;
@@ -33,6 +44,9 @@ export class Multiplexer {
     this.ws.addEventListener("message", this.onMessage);
   }
 
+  /**
+   * Register a handler for one incoming message type.
+   */
   handle(type: MessageType, handler: Handler): Disposable {
     let set = this.handlers.get(type);
 
@@ -48,6 +62,9 @@ export class Multiplexer {
     };
   }
 
+  /**
+   * Remove all handlers for one message type.
+   */
   unhandle(type: MessageType): void {
     this.handlers.delete(type);
   }
@@ -68,6 +85,7 @@ export class Multiplexer {
    * Emit the payload received from an event.
    * @param type prefixed byte
    * @param attach function to subscribe to
+   * @param options optional publish behavior such as trailing debounce
    */
   publish(
     type: MessageType,
@@ -104,6 +122,9 @@ export class Multiplexer {
     };
   }
 
+  /**
+   * Unsubscribe from websocket messages and clear all registered handlers.
+   */
   dispose() {
     this.ws.removeEventListener("message", this.onMessage);
     this.handlers.clear();

@@ -2,6 +2,13 @@ import type { Terminal } from "@xterm/xterm";
 import type { Multiplexer } from "./Multiplexer";
 import { Disposable } from "./types";
 
+/**
+ * Create a resize-event publisher bound to one multiplex channel.
+ *
+ * Payload format (4 bytes, big-endian):
+ * - bytes 0-1: cols (uint16)
+ * - bytes 2-3: rows (uint16)
+ */
 export function createResizePublisher(
   type: number,
 ): (term: Terminal, multiplexer: Multiplexer) => Disposable {

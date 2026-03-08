@@ -1,0 +1,40 @@
+services:
+  ssh:
+    build:
+      context: .
+      dockerfile: docker/ssh.Dockerfile
+    environment:
+      TZ: UTC
+      SSH_USER: ${SSH_USER:-test}
+      SSH_PASS: ${SSH_PASS:-test}
+    ports:
+      - "2222:2222"
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ../..
+      dockerfile: examples/resizing-terminal/docker/server.Dockerfile
+    environment:
+      PORT: 3000
+      SSH_HOST: ssh
+      SSH_PORT: 2222
+      SSH_USER: ${SSH_USER:-test}
+      SSH_PASS: ${SSH_PASS:-test}
+    depends_on:
+      - ssh
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ../..
+      dockerfile: examples/resizing-terminal/docker/client.Dockerfile
+    environment:
+      VITE_WS_URL: ws://localhost:3000/ws
+    depends_on:
+      - server
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
