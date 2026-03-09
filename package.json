@@ -4,7 +4,11 @@
   "description": "Multiplex terminal stream and control messages over a single WebSocket for xterm.js.",
   "scripts": {
     "build": "tsdown",
-    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint src tests eslint.config.mts tsdown.config.mts",
+    "jsr:check": "pnpx jsr publish --dry-run --allow-dirty",
+    "publish:jsr": "pnpx jsr publish",
     "test": "vitest run"
   },
   "exports": {
@@ -36,6 +40,7 @@
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
     "jiti": "^2.6.1",
+    "prettier": "^3.8.1",
     "tsdown": "^0.21.0",
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.0.18"

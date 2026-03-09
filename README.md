@@ -1,6 +1,7 @@
 # xterm-multiplex-addon
 
-`xterm-multiplex-addon` lets you exchange terminal stream data and control messages over a single `WebSocket`.
+`xterm-multiplex-addon` lets you exchange terminal stream data and control
+messages over a single `WebSocket`.
 
 It provides:
 
@@ -16,13 +17,14 @@ pnpm add jsr:@juliusliu/xterm-multiplex-addon
 
 ## JSR
 
-Published as `@juliusliu/xterm-multiplex-addon` with source exports from `./src/index.ts`.
+Published as `@juliusliu/xterm-multiplex-addon` with source exports from
+`./src/index.ts`.
 
 ```ts
 import {
-  Multiplexer,
-  MultiplexAddon,
   createResizePublisher,
+  MultiplexAddon,
+  Multiplexer,
 } from "@juliusliu/xterm-multiplex-addon";
 ```
 
@@ -49,9 +51,9 @@ Example type mapping:
 ```ts
 import { Terminal } from "@xterm/xterm";
 import {
-  Multiplexer,
-  MultiplexAddon,
   createResizePublisher,
+  MultiplexAddon,
+  Multiplexer,
 } from "xterm-multiplex-addon";
 
 const ws = new WebSocket("wss://example.com/shell");
@@ -88,8 +90,8 @@ ws.addEventListener("open", () => {
 new Multiplexer(ws: WebSocket)
 ```
 
-Creates a multiplexer over a single `WebSocket`.
-Internally sets `ws.binaryType = "arraybuffer"` and listens for `message` events.
+Creates a multiplexer over a single `WebSocket`. Internally sets
+`ws.binaryType = "arraybuffer"` and listens for `message` events.
 
 ### `handle(type, handler)`
 
@@ -97,8 +99,8 @@ Internally sets `ws.binaryType = "arraybuffer"` and listens for `message` events
 handle(type: number, handler: (payload: Uint8Array) => void): Disposable
 ```
 
-Registers a handler for incoming payloads of `type`.
-Returns a disposable for that specific handler.
+Registers a handler for incoming payloads of `type`. Returns a disposable for
+that specific handler.
 
 ### `unhandle(type)`
 
@@ -126,8 +128,8 @@ publish(
 ): Disposable
 ```
 
-Utility to bridge an event source to `send(type, payload)`.
-Set `options.debounce` for trailing debounce behavior.
+Utility to bridge an event source to `send(type, payload)`. Set
+`options.debounce` for trailing debounce behavior.
 
 ### `dispose()`
 
@@ -146,7 +148,8 @@ new MultiplexAddon(multiplexer: Multiplexer, streamDataType = 0)
 `@xterm/xterm` addon that:
 
 - sends `term.onData(...)` as UTF-8 bytes on `streamDataType`
-- writes incoming payload from `streamDataType` to terminal (`term.write(payload)`)
+- writes incoming payload from `streamDataType` to terminal
+  (`term.write(payload)`)
 
 Implements `ITerminalAddon`.
 
@@ -187,7 +190,8 @@ function decodeResize(payload: Uint8Array) {
 }
 ```
 
-For stream payloads (`streamDataType`), treat bytes as terminal input/output stream bytes.
+For stream payloads (`streamDataType`), treat bytes as terminal input/output
+stream bytes.
 
 ## Lifecycle And Cleanup
 

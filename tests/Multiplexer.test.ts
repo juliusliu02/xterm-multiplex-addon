@@ -14,7 +14,9 @@ describe("Multiplexer", () => {
     ws.emitMessage(new Uint8Array([7, 1, 2, 3]).buffer);
 
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(Array.from(handler.mock.calls[0]![0] as Uint8Array)).toEqual([1, 2, 3]);
+    expect(Array.from(handler.mock.calls[0]![0] as Uint8Array)).toEqual([
+      1, 2, 3,
+    ]);
   });
 
   it("ignores non-binary, empty, and mismatched frames", () => {

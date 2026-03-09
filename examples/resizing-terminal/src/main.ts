@@ -28,7 +28,12 @@ ws.addEventListener("open", () => {
   // Initial size
   multiplexer.send(
     RESIZE_CHANNEL,
-    new Uint8Array([term.cols >> 8, term.cols & 0xff, term.rows >> 8, term.rows & 0xff]),
+    new Uint8Array([
+      term.cols >> 8,
+      term.cols & 0xff,
+      term.rows >> 8,
+      term.rows & 0xff,
+    ]),
   );
 });
 

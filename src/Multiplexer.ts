@@ -1,4 +1,4 @@
-import type { Handler, Disposable, MessageType } from "./types";
+import type { Disposable, Handler, MessageType } from "./types";
 
 /**
  * Options for `Multiplexer.publish`.

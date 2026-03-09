@@ -4,5 +4,19 @@
   "license": "MIT",
   "description": "Multiplexed WebSocket transport and xterm addon for terminal streaming.",
   "exports": "./src/index.ts",
-  "exclude": ["lib/**", "tests/**", "node_modules/**", "examples/**"]
+  "exclude": [
+    ".github/**",
+    "lib/**",
+    "tests/**",
+    "node_modules/**",
+    "examples/**",
+    ".npmignore",
+    ".prettierignore",
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "eslint.config.mts",
+    "tsconfig.json",
+    "tsdown.config.mts"
+  ]
 }
